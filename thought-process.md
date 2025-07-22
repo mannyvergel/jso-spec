@@ -9,7 +9,10 @@ The journey began with a simple, intuitive structure inspired by a Stack Overflo
 * **Initial Proposal:**  
   * **Success:** `{ "success": true, "payload": { ... } } ` 
   * **Failure:** `{ "success": false, "error": { ... } }`  
-* **Reasoning:** This provided a single boolean flag (success) that developers could check, which is more ergonomic in JavaScript `(if (res.success))` than a string comparison.
+* **Reasoning:**
+  * This provided a single boolean flag (success) that developers could check, which is more ergonomic in JavaScript `(if (res.success))` than a string comparison.
+  * A core principle, shared with JSend, was adopted: the response should be self-contained, not forcing the client to rely solely on HTTP status codes to determine the outcome. This reduces client-side complexity.
+  * It should be noted, however, that this does not mean HTTP status codes can or should be ignored. A server may fail and return a non-JSON response (e.g., with a 500 status code) before a JSO response can be constructed. Developers are given a choice to still use http status codes if they want to and simply ignore the success property if preferred.
 
 #### **Step 2: Refining the Terminology (payload vs. data)**
 
