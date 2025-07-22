@@ -163,6 +163,36 @@ For complex responses, particularly those involving collections that require pag
 }
 ```
 
+## JavaScript Usage
+
+To simplify working with JSO-compliant APIs, an official helper library, `jso-client`, is available. It is a lightweight, zero-dependency wrapper around the Fetch API.
+
+The client can be found on GitHub: [https://github.com/mannyvergel/jso-client](https://github.com/mannyvergel/jso-client)
+
+### Installation
+```bash
+npm install jso-client
+```
+
+### Example
+The client automatically handles the JSO envelope, returning the `data` on success, and throwing a structured `JsoError` on failure.
+
+```javascript
+import { jsoFetch, JsoError } from 'jso-client';
+// Or: const { jsoFetch, JsoError } = require('jso-client');
+
+async function getUser(id) {
+  try {
+    const { data: user } = await jsoFetch(`/api/user/${id}`, { method: 'POST' });
+    console.log('User:', user);
+  } catch (error) {
+    console.error('Request Failed:', error.message);
+  }
+}
+```
+
+For more advanced options and error handling, please check the docs of jso-client.
+
 ## Community and Contribution
 
 I welcome the community to contribute and improve on this initial specification. Please feel free to open issues or pull requests on the GitHub repository.
