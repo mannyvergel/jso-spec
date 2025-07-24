@@ -75,4 +75,15 @@ The last major point to address was the fact that the data field could be either
 * **The Solution:** The decision was made to explicitly allow data to be either an object (for single resources) or an array (for collections).  
 * **Reasoning:** This is a trade-off. While a consistent type is nice, forcing a single resource to be wrapped in an array (data: \[{...}\]) feels unnatural. A more direct and intuitive data structure was prioritized, which is better aligned with the goal of simplicity for prototyping. This was made an explicit rule in the spec to avoid any confusion.
 
-This iterative process of identifying potential issues and creating clear, pragmatic rules allowed the JSO specification to be built into the solid, flexible Draft 1.0 it is today.
+#### **Step 9: Replacing Subjectivity with Clear Guidelines (Namespacing)**
+
+The final major refinement involved the rules for namespacing the data payload.
+
+* **The Problem:** The initial guidelines used subjective terms like "simple" and "complex" to describe when to use namespacing. This was found to be ambiguous and open to interpretation.  
+* **The Solution:** The subjective terms were replaced with objective criteria based on the *nature of the endpoint's response*.  
+  1. **The Default Pattern** was defined for endpoints returning a **single, identifiable resource** (e.g., standard CRUD operations). In this case, the data object should directly contain the resource's attributes.  
+  2. **The Namespaced Pattern** was recommended for two specific scenarios: **Action-Oriented (RPC-style) Endpoints** that return a report or status, and **Compound Documents** that return multiple, distinct resource types.  
+* **Reasoning:** This change provides developers with clear, actionable rules, removing ambiguity and ensuring a more consistent API structure across different types of endpoints. It formalizes the pattern based on whether the response is a resource, a report, or a collection of different resources.
+
+
+

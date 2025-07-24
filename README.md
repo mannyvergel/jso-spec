@@ -1,5 +1,5 @@
 # JSO Specification - Draft 1.0
-**Last Updated: July 22, 2025**
+**Last Updated: July 24, 2025**
 
 A simple, pragmatic, and scalable JSON response format specification.
 
@@ -91,12 +91,76 @@ For more detailed errors, a failed response **MAY** include an optional `errors`
     * For a collection of resources (`GET /users`), `data` **MUST** be an array of objects. If the collection is empty, it **MUST** be an empty array (`[]`).
 * **In Failed Responses (Optional but Recommended):** In a `success: false` response, the `data` field, if present, is **highly recommended** to contain the original data sent by the client that caused the error. This is optional to allow for faster prototyping but provides valuable context for clients to re-populate forms.
 
-#### 2. Handling "Not Found" Resource(s)
+#### 2. Structuring the `data` Payload (Namespacing)
+
+##### The Default Pattern: Single Resource Endpoints
+For any endpoint where the primary purpose is to return a single, identifiable resource (e.g., standard CRUD operations), the `data` object **SHOULD** directly contain the attributes of that resource.
+
+**Example: `GET /users/123`**
+```json
+{
+  "success": true,
+  "data": {
+    "id": 123,
+    "name": "Juan dela Cruz",
+    "email": "juan@example.com"
+  }
+}
+```
+
+##### The Namespaced Pattern: When to Use It
+For more advanced scenarios, it is **highly recommended** to use named keys ("namespaces") inside the `data` object. This pattern should be used in the following situations:
+
+**A. For Action-Oriented (RPC-style) Endpoints:**
+When an endpoint performs an action and returns a *report* or *status* rather than a single resource, namespacing makes the intent clear. An action might also result in an updated resource, making it a good candidate for a compound document response.
+
+**Example: `POST /api/users/123/send-confirmation`**
+This action sends an email and returns a delivery status report along with the updated user resource.
+```json
+{
+  "success": true,
+  "data": {
+    "deliveryStatus": {
+      "recipient": "juan@example.com",
+      "status": "sent",
+      "messageId": "msg-abc-123"
+    },
+    "user": {
+      "id": 123,
+      "name": "Juan dela Cruz",
+      "emailVerified": false,
+      "confirmationEmailSentAt": "2025-07-24T12:10:00Z"
+    }
+  }
+}
+```
+
+**B. For Compound Documents:**
+When an endpoint needs to return multiple, distinct resource types in a single response to improve efficiency.
+
+**Example: `GET /dashboard-summary`**
+```json
+{
+  "success": true,
+  "data": {
+    "user": {
+      "id": 123,
+      "name": "Juan dela Cruz"
+    },
+    "notifications": [
+      { "id": 1, "message": "Your report is ready." },
+      { "id": 2, "message": "New comment on your post." }
+    ]
+  }
+}
+```
+
+#### 3. Handling "Not Found" Resource(s)
 
 * **Collections:** A request for a collection that has no items is considered a success. It **MUST** return `success: true` with an empty array for the `data` field.
 * **Single Resources:** A request for a single resource that does not exist is considered a failure. It **MUST** return a `success: false` response with an appropriate `message` (e.g., "Resource not found.").
 
-#### 3. Distinguishing Error Types (Optional)
+#### 4. Distinguishing Error Types (Optional)
 
 To distinguish between client-side errors (e.g., bad input) and server-side errors (e.g., database failure), an error object within the optional `errors` array **MAY** include a `type` field.
 
@@ -130,7 +194,7 @@ To distinguish between client-side errors (e.g., bad input) and server-side erro
 }
 ```
 
-#### 4. Metadata and Pagination (Optional but Recommended)
+#### 5. Metadata and Pagination (Optional but Recommended)
 
 For complex responses, particularly those involving collections that require pagination, it is **highly recommended** to include optional top-level `meta` and `links` objects.
 
